@@ -22,7 +22,7 @@ const registerUser = async (req, res) => {
 
         // Determine user role: admin if correct token is provide, otherwise member
         let role = "member";
-        if (adminInvitetoken && adminInviteToken == process.env.ADMIN_INVITE_TOKEN) {
+        if (adminInviteToken && adminInviteToken == process.env.ADMIN_INVITE_TOKEN) {
             role = "admin";
         }
 
@@ -58,7 +58,28 @@ const registerUser = async (req, res) => {
 // @access Public
 const loginUser = async (req, res) => {
     try {
+        const { email, password } = req.body;
+
+        const user = await User.findOne({ email });
+        if (!user) {
+            return res.status(401).json({ message: "Invalid email or password" });
+        }
         
+        // compare password
+        const isMatch = await bcrypt.compare(password, user.password);
+        if (!isMatch) {
+            return res.status(401).json({ message: "Invalid email or password" });
+        }
+
+        // return user data with jwt
+        res.json({
+            _id: user._id,
+            name: user.name,
+            email: user.email,
+            role: user.role,
+            profileImageUrl: user.profileImageUrl,
+            token: generateToken(user._id)
+        });
     } catch (error) {
         res.status(500).json({ message: "Server error", error: error.message });
     }
@@ -69,6 +90,7 @@ const loginUser = async (req, res) => {
 // @access Private {Requires JWT}
 const getUserProfile = async (req, res) => {
     try {
+        const user = await User.findById(req.user.id).select("-password");
         
     } catch (error) {
         res.status(500).json({ message: "Server error", error: error.message });
