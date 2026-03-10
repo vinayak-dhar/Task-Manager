@@ -13,6 +13,6 @@ router.post("/", protect, adminOnly, createTask); // create a task (Admin Only) 
 router.put("/:id", protect, updateTask); // update task details -> done
 router.delete("/:id", protect, adminOnly, deleteTask); // delete a task (Admin Only) -> done
 router.put("/:id/status", protect, updateTaskStatus); // update task status -> done
-router.put("/:id/todo", protect, updateTaskCheckList); // update task checklist
+router.put("/:id/todo", protect, updateTaskCheckList); // update task checklist -> done
 
 module.exports = router;
