@@ -203,9 +203,9 @@ const updateTaskStatus = async (req, res) => {
 
         task.status = req.body.status || task.status;
 
-        if (task.status == "Completed") {
+        if (task.status === "Completed") {
             task.todoCheckList.forEach((item) => (item.completed = true));
-            task.progress == 100;
+            task.progress = 100;
         }
 
         await task.save();
