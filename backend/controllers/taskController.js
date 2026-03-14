@@ -291,7 +291,7 @@ const getDashboardData = async (req, res) => {
         ]);
 
         const taskDistribution = taskStatuses.reduce((acc, status) => {
-            const formattedKey = status.replace(/\s + /g, ""); // remove spaces for response keys
+            const formattedKey = status.replace(/\s+/g, ""); // remove spaces for response keys
             acc[formattedKey] = taskDistribuitionRaw.find((item) => item._id === status) ?.count || 0;
             return acc;
         }, {});
@@ -361,7 +361,7 @@ const getUserDashboardData = async (req, res) => {
         ]);
 
         const taskDistribution = taskStatuses.reduce((acc, status) => {
-            const formattedKey = status.replace(/\s + /g, "");
+            const formattedKey = status.replace(/\s+/g, "");
             acc[formattedKey] = taskDistribuitionRaw.find((item) => item._id === status)?.count || 0;
             return acc;
         }, {});
