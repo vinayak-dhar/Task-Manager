@@ -32,7 +32,7 @@ app.use(express.json());
 app.use("/api/auth", authRoutes);
 app.use("/api/users", userRoutes);
 app.use("/api/tasks", taskRoutes);
-app.user("/api/reports", reportRoutes);
+app.use("/api/reports", reportRoutes);
 
 // Start server
 const PORT = process.env.PORT || 5000;
