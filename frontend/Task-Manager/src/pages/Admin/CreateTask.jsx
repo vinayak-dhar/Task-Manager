@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import DashboardLayout from '../../components/layouts/DashboardLayout'
 import { PRIORITY_DATA } from '../../Utils/data'
 import axiosInstance from '../../Utils/axiosinstance'
@@ -22,7 +22,7 @@ const CreateTask = () => {
     title: "",
     description: "",
     priority: "Low",
-    dueDate: null,
+    dueDate: "",
     assignedTo: [],
     todoChecklist: [],
     attachments: [],
@@ -46,7 +46,7 @@ const CreateTask = () => {
       title: "",
       description: "",
       priority: "Low",
-      dueDate: null,
+      dueDate: "",
       assignedTo: [],
       todoChecklist: [],
       attachments: [],
@@ -58,15 +58,12 @@ const CreateTask = () => {
     setLoading(true);
 
     try {
-      const todolist = taskData.todoChecklist?.map((item) => ({
-        text: item,
-        completed: false,
-      }));
+      const todolist = taskData.todoChecklist;
 
       const response = await axiosInstance.post(API_PATHS.TASKS.CREATE_TASK, {
         ...taskData,
         dueDate: new Date(taskData.dueDate).toISOString(),
-        todoChecklist: todolist,
+        todoCheckList: todolist,
       });
 
       toast.success("Task Created Successfully");
@@ -119,13 +116,47 @@ const CreateTask = () => {
 
   // get Task info by ID
   const getTaskDetailsByID = async () => {
+    try {
+      const response = await axiosInstance.get(API_PATHS.TASKS.GET_TASK_BY_ID(taskId));
 
+      if (response.data) {
+        const taskInfo = response.data;
+        setCurrentTask(taskInfo);
+
+        setTaskData((prevData) => ({
+          title: taskInfo.title,
+          description: taskInfo.description,
+          priority: taskInfo.priority,
+          dueDate: taskInfo.dueDate
+            ? moment(taskInfo.dueDate).format("YYYY-MM-DD")
+            : "",
+          assignedTo: taskInfo?.assignedTo?.map((item) => item?._id) || [],
+          todoChecklist: taskInfo?.todoCheckList || [],
+          attachments: taskInfo?.attachments || [],
+        }));
+
+        console.log("CheckList:", taskInfo.todoChecklist);
+        console.log("Full API:", response.data);
+        console.log("AssignedTo:", taskInfo.assignedTo);
+        console.log("AssignedTo:", taskData.assignedTo);
+      }
+    } catch (error) {
+      console.error("Error fetching users:", error);
+    }
   };
 
   // Delete Task
   const deleteTask = async () => {
-
+    
   };
+
+  useEffect(() => {
+    if (taskId) {
+      getTaskDetailsByID(taskId);
+    }
+
+    return () => {};
+  }, [taskId]);
 
 
   return (
@@ -201,7 +232,7 @@ const CreateTask = () => {
                 <input 
                   placeholder='create App UI'
                   className='form-input'
-                  value={taskData.dueDate}
+                  value={taskData.dueDate || ""}
                   onChange={({ target }) => handleValueChange("dueDate", target.value)}
                   type='date'
                 />
