@@ -79,7 +79,35 @@ const CreateTask = () => {
 
   // Update Task
   const updateTask = async () => {
+    setLoading(true);
 
+    try {
+      const todoList = taskData.todoChecklist?.map((item) => {
+        const prevTodoCheckList = currentTask?.todoCheckList || [];
+        const matchedTask = prevTodoCheckList.find((task) => task.text == item.text);
+
+        return {
+          text: item.text,
+          completed: matchedTask ? matchedTask.completed : false,
+        };
+      });
+
+      const response = await axiosInstance.put(
+        API_PATHS.TASKS.UPDATE_TASK(taskId),
+        {
+          ...taskData,
+          dueDate: new Date(taskData.dueDate).toISOString(),
+          todoCheckList: todoList,
+        }
+      );
+
+      toast.success("Task Updated Successfully");
+    } catch (error) {
+      console.error("Error creating task:", error);
+      setLoading(false);
+    } finally {
+      setLoading(false);
+    }
   };
 
   const handleSubmit = async () => {
@@ -135,10 +163,10 @@ const CreateTask = () => {
           attachments: taskInfo?.attachments || [],
         }));
 
-        console.log("CheckList:", taskInfo.todoChecklist);
-        console.log("Full API:", response.data);
-        console.log("AssignedTo:", taskInfo.assignedTo);
-        console.log("AssignedTo:", taskData.assignedTo);
+        // console.log("CheckList:", taskInfo.todoCheckList);
+        // console.log("Full API:", response.data);
+        // console.log("AssignedTo:", taskInfo.assignedTo);
+        // console.log("AssignedTo:", taskData.assignedTo);
       }
     } catch (error) {
       console.error("Error fetching users:", error);
